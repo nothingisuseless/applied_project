@@ -1,0 +1,66 @@
+## ************************************GROUP 6 ASSIGNMENT************************************************
+## ************************************CHAKRAVORTY DEVOPRIYA DEVASHISH************************************************
+## ************************************SUMIT MUKHERJEE****************************************************************
+## ************************************SOUAGATA DUTTA*****************************************************************
+## ************************************VINEET SINHA*******************************************************************
+## ************************************VIJAY KUMAR********************************************************************
+## ************************************SUNIL SINGH********************************************************************
+
+
+## Run the below commands in terminal first to install some of the libraries
+# To install python3 pip
+sudo apt install python3-pip
+
+# To install venv for virtual environment
+sudo apt install python3-venv
+
+# create virtual environment named wans
+python3 -m venv .wans
+
+# Activate the virtual environment
+source .wans/bin/activate
+
+## Install crypto libraries
+sudo pip3 install pycryptodome
+
+
+## clien_side_key_exchange.py
+This file is important to generate and send the keys
+THESE FILE GENERATES THE CLIENT SIDE PRIVATE AND PUBLIC KEY
+AND THEN RECEIVES THE SERVER SIDE PUBLIC KEY FROM SERVER
+AND SEND THE CLIENT SIDE PUBLIC KEY TO SERVER
+
+## server_side_key_exchange.py
+This file is important to generate and send the keys
+THESE FILE GENERATES THE SERVER SIDE PRIVATE AND PUBLIC KEY
+AND THEN RECEIVES THE CLIENT SIDE PUBLIC KEY FROM CLIENT
+AND SEND THE SERVER SIDE PUBLIC KEY TO CLEINT
+
+## How to run the code
+server.py ==> execute by running the below code
+              python3 server.py
+
+client.py ==> execute by running the below code
+              python3 client.py
+
+In one terminal run server.py, in another terminal run client.py
+
+
+## HOW THIS PROTOCOL WORKS
+ ASSUMPTION : SERVER ALREADY HAS PUBLIC KEY OF CLIENT
+              CLEINT ALREADY HAS PUBLIC KEY OF SERVER
+    THE KEY SHARING IS ACHEIVED USING clien_side_key_exchange.py and server_side_key_exchange.py
+    
+
+## PROTOCOL WORKING
+FIRSTLY THE SOCKET CONNECTION IS ESTABLISHED BETWEEN SERVER AND CLIENT
+CLIENT SENDS "HELLO" TO SERVER
+SERVER SENDS "HELLO+ACK" TO CLIENT
+CLIENT SENDS "ACK" BACK TO CLIENT
+  SERVER SENDS THE ENCRYPTED AES KEY 
+  SERVER RECEIVES ENCYPTED AND SIGNED MESSAGE FROM THE CLIENT
+  SERVER DECRYPTS THE MESSAGE USING SESSION KEY
+  SERVER VERIFIES THE SIGNATURE USING CLIENTS PUBLIC KEY
+CLIENT SENDS THE CLOSE MESSAGE TO SERVER AND THE CONNECTION IS TERMINATED
+
+
