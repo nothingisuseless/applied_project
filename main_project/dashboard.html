@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Dashboard</h1>
+    
+    <!-- Table for displaying user data -->
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>IP Address</th>
+                <th>City</th>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="user-data">
+            <!-- Data rows will be dynamically inserted here -->
+            {% for email, info in user_data.items() %}
+            <tr>
+                <td>{{ email }}</td>
+                <td>{{ info.ip_address }}</td>
+                <td>{{ info.geo_info.city or 'N/A' }}</td>
+                <td>{{ info.geo_info.region or 'N/A' }}</td>
+                <td>{{ info.geo_info.country or 'N/A' }}</td>
+                <td>{{ info.timestamp }}</td> <!-- Display the timestamp -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Leaflet.js map -->
+    <div id="map"></div>
+
+    <!-- Include jQuery, Leaflet.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <script>
+        $(document).ready(function() {
+            // Initialize the map
+            var map = L.map('map').setView([0, 0], 2); // Initialize map with default view
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Function to fetch and display user data
+            function fetchData() {
+                $.getJSON('/fetch_user_data', function(data) {
+                    // Clear any existing markers on the map
+                    map.eachLayer(function(layer) {
+                        if (layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                    });
+
+                    // Clear the table body
+                    $('#user-data').empty();
+
+                    // Populate table and add markers on the map
+                    $.each(data, function(email, info) {
+                        // Populate table
+                        $('#user-data').append(`
+                            <tr>
+                                <td>${email}</td>
+                                <td>${info.ip_address}</td>
+                                <td>${info.geo_info.city || 'N/A'}</td>
+                                <td>${info.geo_info.region || 'N/A'}</td>
+                                <td>${info.geo_info.country || 'N/A'}</td>
+                                <td>${info.timestamp || 'N/A'}</td> <!-- Display the timestamp -->
+                            </tr>
+                        `);
+
+                        // Add markers on the map
+                        if (info.latitude && info.longitude) {
+                            L.marker([parseFloat(info.latitude), parseFloat(info.longitude)])
+                                .bindPopup(`
+                                    <b>Email:</b> ${email}<br>
+                                    <b>IP Address:</b> ${info.ip_address}<br>
+                                    <b>City:</b> ${info.geo_info.city || 'N/A'}<br>
+                                    <b>Region:</b> ${info.geo_info.region || 'N/A'}<br>
+                                    <b>Country:</b> ${info.geo_info.country || 'N/A'}<br>
+                                    <b>Timestamp:</b> ${info.timestamp || 'N/A'}
+                                `)
+                                .addTo(map);
+                        }
+                    });
+                });
+            }
+
+            fetchData(); // Initial fetch
+            setInterval(fetchData, 30000); // Fetch data every 30 seconds
+        });
+    </script>
+</body>
+</html>
